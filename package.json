@@ -1,0 +1,28 @@
+{
+  "name": "url-slicer.js",
+  "version": "0.1.0",
+  "description": "Slice URLs into logical parts - domain, tld or subdomains",
+  "main": "url-slicer.js",
+  "devDependencies": {
+    "should": "^4.0.4",
+    "chai": "~1.9.1",
+    "chai-as-promised": "~4.1.1",
+    "mocha": "~1.21.4",
+    "q": "^1.0.1"
+  },
+  "repository": {
+      "type": "git",
+      "url": "git://github.com/nacholibre/url-slicer.js.git"
+  },
+  "keywords": [
+      "url slicer",
+      "extract url",
+      "extract domain",
+      "tld extract"
+  ],
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "author": "Yoan Arnaudov <jonidev@gmail.com>",
+  "license": "MIT"
+}
