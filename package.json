@@ -1,5 +1,5 @@
 {
-  "name": "url-slicer.js",
+  "name": "url-slicer",
   "version": "0.1.0",
   "description": "Slice URLs into logical parts - domain, tld or subdomains",
   "main": "url-slicer.js",
@@ -22,6 +22,9 @@
   ],
   "engines": {
     "node": ">=0.10.0"
+  },
+  "scripts": {
+      "test": "mocha url-slicer-tests.js"
   },
   "author": "Yoan Arnaudov <jonidev@gmail.com>",
   "license": "MIT"
