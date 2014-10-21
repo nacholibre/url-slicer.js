@@ -1,6 +1,6 @@
 {
   "name": "url-slicer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Slice URLs into logical parts - domain, tld or subdomains",
   "main": "url-slicer.js",
   "devDependencies": {
