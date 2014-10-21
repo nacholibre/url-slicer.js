@@ -65,7 +65,9 @@
     };
 
     urlSlicer.removeLocalSuffixList = function() {
-        fs.unlink(PUBLIC_SUFFIX_FILE_LOCATION);
+        if (fs.exists(PUBLIC_SUFFIX_FILE_LOCATION)) {
+            fs.unlink(PUBLIC_SUFFIX_FILE_LOCATION);
+        }
     };
 
     urlSlicer.trimUrl = function(url) {

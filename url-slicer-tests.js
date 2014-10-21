@@ -9,10 +9,10 @@
 
     var urlSlicer = require('./url-slicer.js');
 
-    describe.skip('Suffix list download/load', function() {
+    describe('Suffix list download/load', function() {
         this.timeout(15000); //15 seconds timeout because download can be slow
 
-        it.skip('should download mozilla tlds file', function() {
+        it('should download mozilla tlds file', function() {
             return urlSlicer.downloadSuffixList().then(function() {
                 return urlSlicer.loadSuffixList();
             }).then(function() {
