@@ -56,7 +56,7 @@ urlSlicer.slice('my.agriculture.museum');
 
 ##API
 ###urlSlicer.init()
-Returns promise when publix suffix list is downloaded and loaded. You can't use `slice` before init promise is fulfilled.
+Returns promise when publix suffix list is downloaded and loaded. You can't use `slice` before init() promise is fulfilled.
 
 ###urlSlicer.slice(url)
 Returns object with these properties
