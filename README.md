@@ -60,6 +60,8 @@ Returns promise when publix suffix list is downloaded and loaded.
 
 ###urlSlicer.slice(url, callback)
 The `callback` is called with one parameter which is the result object.
+
+`slice()` will call `init()` if necessary.
 ```javascript
 { domain: 'google',
   tld: 'com',
