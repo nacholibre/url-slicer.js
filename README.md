@@ -11,11 +11,11 @@ Install by running `npm install url-slicer`
 ```javascript
 var urlSlicer = require('url-slicer');
 
-urlSlicer.init().then(function() {
-  urlSlicer.slice('http://dir.com');
+urlSlicer.slice('http://dir.com', function(sliced) {
+    console.log(sliced);
 });
 ```
-Will return
+Output:
 ```javascript
 { domain: 'dir',
   tld: 'com',
@@ -24,11 +24,11 @@ Will return
   subdomains: [] }
 ```
 
-Url Slicer is using public suffix list https://publicsuffix.org/list/ for tlds information.
+Url Slicer is using the public suffix list which can be found here https://publicsuffix.org/list/.
 
 More examples
 ```javascript
-urlSlicer.slice('http://police.uk');
+//http://police.uk
 { domain: null,
   tld: null,
   query: null,
@@ -37,7 +37,7 @@ urlSlicer.slice('http://police.uk');
 
 ```
 ```javascript
-urlSlicer.slice('http://www.police.uk');
+//http://www.police.uk
 { domain: 'www',
   tld: 'police.uk',
   query: undefined,
@@ -45,7 +45,7 @@ urlSlicer.slice('http://www.police.uk');
   subdomains: [] }
 ```
 ```javascript
-urlSlicer.slice('my.agriculture.museum');
+//my.agriculture.museum
 { domain: 'my',
   tld: 'agriculture.museum',
   query: undefined,
@@ -56,10 +56,10 @@ urlSlicer.slice('my.agriculture.museum');
 
 ##API
 ###urlSlicer.init()
-Returns promise when publix suffix list is downloaded and loaded. You can't use `slice` before init() promise is fulfilled.
+Returns promise when publix suffix list is downloaded and loaded.
 
-###urlSlicer.slice(url)
-Returns object with these properties
+###urlSlicer.slice(url, callback)
+The `callback` is called with one parameter which is the result object.
 ```javascript
 { domain: 'google',
   tld: 'com',

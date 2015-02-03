@@ -12,12 +12,18 @@
     var PUBLIC_SUFFIX_FILE_LOCATION = '.suffixlist';
     var _suffixData = [];
 
+    var initPromise = false;
+
     urlSlicer.init = function() {
-        return urlSlicer.loadSuffixList().catch(function() {
-            return urlSlicer.downloadSuffixList();
-        }).finally(function() {
-            return urlSlicer.loadSuffixList();
-        });
+        if (!initPromise) {
+            initPromise = urlSlicer.loadSuffixList().catch(function() {
+                return urlSlicer.downloadSuffixList();
+            }).finally(function() {
+                return urlSlicer.loadSuffixList();
+            });
+        }
+
+        return initPromise;
     };
 
     urlSlicer.downloadSuffixList = function(downloadTo) {
@@ -44,6 +50,7 @@
 
     urlSlicer.loadSuffixList = function() {
         var deferred = q.defer();
+
         fs.readFile(PUBLIC_SUFFIX_FILE_LOCATION, function(err, data) {
             if (err) {
                 deferred.reject(err);
@@ -57,6 +64,7 @@
                 deferred.resolve();
             }
         });
+
         return deferred.promise;
     };
 
@@ -149,77 +157,82 @@
         return punycode.toUnicode(domain);
     };
 
-    urlSlicer.slice = function(url) {
-        url = this.trimUrl(url);
-        var splitBySlash = url.split('/');
-        var domain = url;
-        var query;
-        var tld;
-        var valid = true;
-        var subdomains = [];
-        var punyEncoded;
-        domain = url;
+    urlSlicer.slice = function(url, done) {
+        var self = this;
 
-        if (splitBySlash.length > 1) {
-            domain = splitBySlash[0];
-            query = splitBySlash.splice(1).join('/');
-        }
+        urlSlicer.init().then(function() {
+            url = self.trimUrl(url);
+            var splitBySlash = url.split('/');
+            var domain = url;
+            var query;
+            var tld;
+            var valid = true;
+            var subdomains = [];
+            var punyEncoded;
+            domain = url;
 
-        punyEncoded = this.isPunyEncoded(domain);
+            if (splitBySlash.length > 1) {
+                domain = splitBySlash[0];
+                query = splitBySlash.splice(1).join('/');
+            }
 
-        if(punyEncoded) {
-            domain = this.punyToUtf(domain);
-        }
 
-        tld = this.sliceTld(domain);
-        if (tld === domain) {
-            valid = false;
-        }
-        domain = domain.replace('.' + tld, '');
+            punyEncoded = self.isPunyEncoded(domain);
 
-        if (tld && tld[0] === '*') {
-            var dom = domain;
-            domain = domain.replace(tld.slice(2), '');
-            if (domain === '') {
+            if(punyEncoded) {
+                domain = self.punyToUtf(domain);
+            }
+
+            tld = self.sliceTld(domain);
+            if (tld === domain) {
                 valid = false;
             }
-            tld = domain.split('.').reverse()[1] + '.' + tld.slice(2);
-            domain = dom.replace('.' + tld, '');
-        } else if (tld && tld[0] === '!') {
-            var splitByDot = tld.split('.');
-            splitByDot = splitByDot.slice(1);
-            tld = splitByDot.join('.');
             domain = domain.replace('.' + tld, '');
-        }
 
-        if(domain.length > 1) {
-            subdomains = domain.split('.');
-            domain = subdomains.splice(-1)[0];
-        }
+            if (tld && tld[0] === '*') {
+                var dom = domain;
+                domain = domain.replace(tld.slice(2), '');
+                if (domain === '') {
+                    valid = false;
+                }
+                tld = domain.split('.').reverse()[1] + '.' + tld.slice(2);
+                domain = dom.replace('.' + tld, '');
+            } else if (tld && tld[0] === '!') {
+                var splitByDot = tld.split('.');
+                splitByDot = splitByDot.slice(1);
+                tld = splitByDot.join('.');
+                domain = domain.replace('.' + tld, '');
+            }
 
-        var validUrl = true;
-        var validate = this.valid(domain, tld, url);
-        if (validate === false || valid === false) {
-            domain = null;
-            tld = null;
-            query = null;
-            subdomains = [];
-            validUrl = false;
-        }
+            if(domain.length > 1) {
+                subdomains = domain.split('.');
+                domain = subdomains.splice(-1)[0];
+            }
 
-        if(punyEncoded) {
-            domain = punycode.toASCII(domain);
-            tld = punycode.toASCII(tld);
-            subdomains = subdomains.map(punycode.toASCII);
-        }
+            var validUrl = true;
+            var validate = self.valid(domain, tld, url);
+            if (validate === false || valid === false) {
+                domain = null;
+                tld = null;
+                query = null;
+                subdomains = [];
+                validUrl = false;
+            }
 
-        var res = {};
-        res.domain = domain;
-        res.tld = tld;
-        res.query = query;
-        res.valid = validUrl;
-        res.subdomains = subdomains;
-        return res;
+            if(punyEncoded) {
+                domain = punycode.toASCII(domain);
+                tld = punycode.toASCII(tld);
+                subdomains = subdomains.map(punycode.toASCII);
+            }
+
+            var res = {};
+            res.domain = domain;
+            res.tld = tld;
+            res.query = query;
+            res.valid = validUrl;
+            res.subdomains = subdomains;
+            done(res);
+        });
     };
 
     module.exports = urlSlicer;
