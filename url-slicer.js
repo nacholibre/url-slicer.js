@@ -229,9 +229,15 @@
             res.domain = domain;
             res.tld = tld;
             res.query = query;
-            res.valid = validUrl;
             res.subdomains = subdomains;
-            done(res);
+
+            var error = null;
+
+            if (!validUrl) {
+                error = 'Query is not valid domain name.';
+            }
+
+            done(error, res);
         });
     };
 

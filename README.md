@@ -11,7 +11,7 @@ Install by running `npm install url-slicer`
 ```javascript
 var urlSlicer = require('url-slicer');
 
-urlSlicer.slice('http://dir.com', function(sliced) {
+urlSlicer.slice('http://dir.com', function(err, sliced) {
     console.log(sliced);
 });
 ```
@@ -20,7 +20,6 @@ Output:
 { domain: 'dir',
   tld: 'com',
   query: undefined,
-  valid: true,
   subdomains: [] }
 ```
 
@@ -29,19 +28,13 @@ Url Slicer is using the public suffix list which can be found here https://publi
 More examples
 ```javascript
 //http://police.uk
-{ domain: null,
-  tld: null,
-  query: null,
-  valid: false,
-  subdomains: [] }
-
+not valid
 ```
 ```javascript
 //http://www.police.uk
 { domain: 'www',
   tld: 'police.uk',
   query: undefined,
-  valid: true,
   subdomains: [] }
 ```
 ```javascript
@@ -49,7 +42,6 @@ More examples
 { domain: 'my',
   tld: 'agriculture.museum',
   query: undefined,
-  valid: true,
   subdomains: [] }
 
 ```
@@ -59,11 +51,11 @@ More examples
 Returns promise when publix suffix list is downloaded and loaded.
 
 ###urlSlicer.slice(url, callback)
-The `callback` is called with one parameter which is the result object.
+The `callback` is called with two parameters - first is the error (if query is not
+valid domain) and the second is the result object:
 ```javascript
 { domain: 'google',
   tld: 'com',
   query: undefined,
-  valid: true,
   subdomains: [] }
 ```
