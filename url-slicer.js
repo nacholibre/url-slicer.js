@@ -158,10 +158,8 @@
     };
 
     urlSlicer.slice = function(url, done) {
-        var self = this;
-
         urlSlicer.init().then(function() {
-            url = self.trimUrl(url);
+            url = urlSlicer.trimUrl(url);
             var splitBySlash = url.split('/');
             var domain = url;
             var query;
@@ -176,14 +174,13 @@
                 query = splitBySlash.splice(1).join('/');
             }
 
-
-            punyEncoded = self.isPunyEncoded(domain);
+            punyEncoded = urlSlicer.isPunyEncoded(domain);
 
             if(punyEncoded) {
-                domain = self.punyToUtf(domain);
+                domain = urlSlicer.punyToUtf(domain);
             }
 
-            tld = self.sliceTld(domain);
+            tld = urlSlicer.sliceTld(domain);
             if (tld === domain) {
                 valid = false;
             }
@@ -210,7 +207,7 @@
             }
 
             var validUrl = true;
-            var validate = self.valid(domain, tld, url);
+            var validate = urlSlicer.valid(domain, tld, url);
             if (validate === false || valid === false) {
                 domain = null;
                 tld = null;

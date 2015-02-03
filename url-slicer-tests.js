@@ -8,6 +8,8 @@
     var expect = chai.expect;
     chai.use(chaiAsPromised);
 
+    var Promise = require('bluebird');
+
     var urlSlicer = require('./url-slicer.js');
 
     describe('Suffix list download/load', function() {
@@ -43,6 +45,17 @@
 
     describe('Extract', function() {
         //urlSlicer.init().then(done);
+
+        it('should work with promisify', function(done) {
+            var func = Promise.promisify(urlSlicer.slice);
+
+            func('dir.com').then(function(sliced) {
+                sliced.domain.should.equal('dir');
+                sliced.tld.should.equal('com');
+                sliced.subdomains.should.have.length(0);
+                done();
+            });
+        });
 
         it('should slice simple com domain url', function(done) {
             urlSlicer.slice('dir.com', function(err, sliced) {
