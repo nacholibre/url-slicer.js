@@ -61,6 +61,8 @@ Returns promise when publix suffix list is downloaded and loaded.
 ###urlSlicer.slice(url, callback)
 The `callback` is called with one parameter which is the result object.
 
+The first slice can be slow, because it downloads and parses 10k lines of data.
+
 `slice()` will call `init()` if necessary.
 ```javascript
 { domain: 'google',
