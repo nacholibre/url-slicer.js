@@ -20,10 +20,10 @@
                 return urlSlicer.loadSuffixList();
             }).then(function() {
                 var suffixData = urlSlicer._getSuffixData();
-                suffixData.indexOf('com').should.not.equal(-1);
-                suffixData.indexOf('bg').should.not.equal(-1);
-                suffixData.indexOf('national.museum').should.not.equal(-1);
-                suffixData.indexOf('台湾').should.not.equal(-1);
+                assert('com' in suffixData);
+                assert('bg' in suffixData);
+                assert('national.museum' in suffixData);
+                assert('台湾' in suffixData);
             });
         });
 
@@ -31,14 +31,14 @@
             urlSlicer.removeLocalSuffixList();
             return urlSlicer.init().then(function() {
                 var suffixData = urlSlicer._getSuffixData();
-                suffixData.indexOf('com').should.not.equal(-1);
+                assert('com' in suffixData);
             });
         });
 
         it('should load suffix list, without downloading it', function() {
             return urlSlicer.init().then(function() {
                 var suffixData = urlSlicer._getSuffixData();
-                suffixData.indexOf('com').should.not.equal(-1);
+                assert('com' in suffixData);
             });
         });
     });
