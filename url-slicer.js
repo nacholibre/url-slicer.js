@@ -10,7 +10,7 @@
 
     var PUBLIC_SUFFIX_LIST_LOCATION = 'https://publicsuffix.org/list/effective_tld_names.dat';
     var PUBLIC_SUFFIX_FILE_LOCATION = '.suffixlist';
-    var _suffixData = [];
+    var _suffixData = {};
 
     var initPromise = false;
 
@@ -58,7 +58,7 @@
                 data.toString().split("\n").forEach(function(line) {
                     //skip comment and empty lines
                     if(line.indexOf('//') === -1 && line !== '') {
-                        _suffixData.push(line);
+                        _suffixData[line] = true;
                     }
                 });
                 deferred.resolve();
@@ -101,7 +101,7 @@
 
         var foundSuffixes = [];
         combinations.forEach(function(value) {
-            if (suffixArray.indexOf(value) !== -1) {
+            if (value in suffixArray) {
                 foundSuffixes.push(value);
             }
         });

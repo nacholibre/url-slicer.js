@@ -4,10 +4,12 @@
   "description": "Slice URLs into logical parts - domain, tld or subdomains",
   "main": "url-slicer.js",
   "devDependencies": {
+    "async": "^0.9.0",
     "bluebird": "^2.9.6",
     "chai": "~1.9.1",
     "chai-as-promised": "~4.1.1",
     "mocha": "~1.21.4",
+    "n-readlines": "^0.2.0",
     "should": "^4.0.4"
   },
   "repository": {
