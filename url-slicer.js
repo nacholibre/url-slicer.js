@@ -184,7 +184,19 @@
             if (tld === domain) {
                 valid = false;
             }
-            domain = domain.replace('.' + tld, '');
+
+            //domain = domain.replace('.' + tld, '');
+            //if (url.indexOf(domain) == -1) {
+            //    domain = url.substr(0, url.length - (tld.length + 1));
+            //}
+
+            var endTld = domain.substr(domain.length - tld.length - 1);
+            if (endTld === '.' + tld) {
+                domain = domain.substr(0, domain.length - (tld.length + 1));
+            }
+            //console.log(domain);
+            //domain = domain.replace('.' + tld, '');
+
 
             if (tld && tld[0] === '*') {
                 var dom = domain;
