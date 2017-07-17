@@ -50,12 +50,13 @@ not valid
 ### urlSlicer.init()
 Returns promise when publix suffix list is downloaded and loaded.
 
-### urlSlicer.slice(url, callback)
-The `callback` is called with two parameters - first is the error (if query is not
-valid domain) and the second is the result object:
+### urlSlicer.slice(url)
+Returns object with sliced url data:
 ```javascript
 { domain: 'google',
   tld: 'com',
   query: undefined,
   subdomains: [] }
 ```
+
+`SliceException` is thrown on slice error.

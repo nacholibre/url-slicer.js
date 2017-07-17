@@ -13,6 +13,12 @@
     var _suffixData = {};
 
     var initPromise = false;
+    var suffixListLoaded = false;
+
+    function SliceException(message) {
+        this.message = message;
+        this.name = 'SliceException';
+    }
 
     urlSlicer.init = function() {
         if (!initPromise) {
@@ -61,6 +67,7 @@
                         _suffixData[line] = true;
                     }
                 });
+                suffixListLoaded = true;
                 deferred.resolve();
             }
         });
@@ -157,97 +164,105 @@
         return punycode.toUnicode(domain);
     };
 
-    urlSlicer.slice = function(url, done) {
-        urlSlicer.init().then(function() {
-            url = urlSlicer.trimUrl(url);
-            var splitBySlash = url.split('/');
-            var domain = url;
-            var query;
-            var tld;
-            var valid = true;
-            var subdomains = [];
-            var punyEncoded;
-            domain = url;
+    urlSlicer.slice = function(url) {
+        if (!suffixListLoaded) {
+            throw 'You have to call .init() and wait for it to complete before you can use slice().';
+        }
 
-            if (splitBySlash.length > 1) {
-                domain = splitBySlash[0];
-                query = splitBySlash.splice(1).join('/');
-            }
+        url = urlSlicer.trimUrl(url);
+        var splitBySlash = url.split('/');
+        var domain = url;
+        var query;
+        var tld;
+        var valid = true;
+        var subdomains = [];
+        var punyEncoded;
+        domain = url;
 
-            punyEncoded = urlSlicer.isPunyEncoded(domain);
+        if (splitBySlash.length > 1) {
+            domain = splitBySlash[0];
+            query = splitBySlash.splice(1).join('/');
+        }
 
-            if(punyEncoded) {
-                domain = urlSlicer.punyToUtf(domain);
-            }
+        punyEncoded = urlSlicer.isPunyEncoded(domain);
 
-            tld = urlSlicer.sliceTld(domain);
-            if (tld === domain) {
+        if(punyEncoded) {
+            domain = urlSlicer.punyToUtf(domain);
+        }
+
+        tld = urlSlicer.sliceTld(domain);
+        if (tld === domain) {
+            valid = false;
+        }
+
+        //domain = domain.replace('.' + tld, '');
+        //if (url.indexOf(domain) == -1) {
+        //    domain = url.substr(0, url.length - (tld.length + 1));
+        //}
+
+        var endTld = domain.substr(domain.length - tld.length - 1);
+        if (endTld === '.' + tld) {
+            domain = domain.substr(0, domain.length - (tld.length + 1));
+        }
+        //console.log(domain);
+        //domain = domain.replace('.' + tld, '');
+
+
+        if (tld && tld[0] === '*') {
+            var dom = domain;
+            domain = domain.replace(tld.slice(2), '');
+            if (domain === '') {
                 valid = false;
             }
+            tld = domain.split('.').reverse()[1] + '.' + tld.slice(2);
+            domain = dom.replace('.' + tld, '');
+        } else if (tld && tld[0] === '!') {
+            var splitByDot = tld.split('.');
+            splitByDot = splitByDot.slice(1);
+            tld = splitByDot.join('.');
+            domain = domain.replace('.' + tld, '');
+        }
 
-            //domain = domain.replace('.' + tld, '');
-            //if (url.indexOf(domain) == -1) {
-            //    domain = url.substr(0, url.length - (tld.length + 1));
-            //}
+        if(domain.length > 1) {
+            subdomains = domain.split('.');
+            domain = subdomains.splice(-1)[0];
+        }
 
-            var endTld = domain.substr(domain.length - tld.length - 1);
-            if (endTld === '.' + tld) {
-                domain = domain.substr(0, domain.length - (tld.length + 1));
-            }
-            //console.log(domain);
-            //domain = domain.replace('.' + tld, '');
+        var validUrl = true;
+        var validate = urlSlicer.valid(domain, tld, url);
+        if (validate === false || valid === false) {
+            domain = null;
+            tld = null;
+            query = null;
+            subdomains = [];
+            validUrl = false;
+        }
 
+        if(punyEncoded) {
+            domain = punycode.toASCII(domain);
+            tld = punycode.toASCII(tld);
+            subdomains = subdomains.map(punycode.toASCII);
+        }
 
-            if (tld && tld[0] === '*') {
-                var dom = domain;
-                domain = domain.replace(tld.slice(2), '');
-                if (domain === '') {
-                    valid = false;
-                }
-                tld = domain.split('.').reverse()[1] + '.' + tld.slice(2);
-                domain = dom.replace('.' + tld, '');
-            } else if (tld && tld[0] === '!') {
-                var splitByDot = tld.split('.');
-                splitByDot = splitByDot.slice(1);
-                tld = splitByDot.join('.');
-                domain = domain.replace('.' + tld, '');
-            }
+        var res = {};
+        res.domain = domain;
+        res.tld = tld;
+        res.query = query;
+        res.subdomains = subdomains;
 
-            if(domain.length > 1) {
-                subdomains = domain.split('.');
-                domain = subdomains.splice(-1)[0];
-            }
+        var error = null;
 
-            var validUrl = true;
-            var validate = urlSlicer.valid(domain, tld, url);
-            if (validate === false || valid === false) {
-                domain = null;
-                tld = null;
-                query = null;
-                subdomains = [];
-                validUrl = false;
-            }
+        if (!validUrl) {
+            error = 'Query is not valid domain name.';
+        }
 
-            if(punyEncoded) {
-                domain = punycode.toASCII(domain);
-                tld = punycode.toASCII(tld);
-                subdomains = subdomains.map(punycode.toASCII);
-            }
+        if (error) {
+            throw SliceException(error);
+        }
 
-            var res = {};
-            res.domain = domain;
-            res.tld = tld;
-            res.query = query;
-            res.subdomains = subdomains;
+        return res;
 
-            var error = null;
-
-            if (!validUrl) {
-                error = 'Query is not valid domain name.';
-            }
-
-            done(error, res);
-        });
+        //done(error, res);
     };
 
     module.exports = urlSlicer;
