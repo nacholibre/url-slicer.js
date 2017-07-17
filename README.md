@@ -1,13 +1,13 @@
 [![Build Status](https://travis-ci.org/nacholibre/url-slicer.js.svg?branch=master)](https://travis-ci.org/nacholibre/url-slicer.js)
 
-#url-slicer.js
+# url-slicer.js
 
 Slice URLs into logical parts - domain, tld or subdomains for node.js
 
-###Installation
+### Installation
 Install by running `npm install url-slicer`
 
-###Usage
+### Usage
 ```javascript
 var urlSlicer = require('url-slicer');
 
@@ -46,11 +46,11 @@ not valid
 
 ```
 
-##API
+## API
 ###urlSlicer.init()
 Returns promise when publix suffix list is downloaded and loaded.
 
-###urlSlicer.slice(url, callback)
+### urlSlicer.slice(url, callback)
 The `callback` is called with two parameters - first is the error (if query is not
 valid domain) and the second is the result object:
 ```javascript
