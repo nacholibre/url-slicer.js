@@ -47,7 +47,7 @@ not valid
 ```
 
 ## API
-###urlSlicer.init()
+### urlSlicer.init()
 Returns promise when publix suffix list is downloaded and loaded.
 
 ### urlSlicer.slice(url, callback)
